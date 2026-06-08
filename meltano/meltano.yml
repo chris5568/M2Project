@@ -1,0 +1,64 @@
+version: 1
+default_environment: dev
+project_id: 019ea6e0-2686-7b8b-b70f-d458be802934
+send_anonymous_usage_stats: false
+
+environments:
+- name: dev
+- name: staging
+- name: prod
+
+plugins:
+  extractors:
+  - name: tap-csv
+    variant: meltanolabs
+    pip_url: git+https://github.com/MeltanoLabs/tap-csv.git
+    config:
+      # Each entry maps a CSV in ../dataset/ to a stream that target-bigquery will
+      # land as a table named after `entity` (prefixed by the loader's table_prefix).
+      files:
+      - entity: olist_customers_dataset
+        path: ../dataset/olist_customers_dataset.csv
+        keys: [customer_id]
+      - entity: olist_orders_dataset
+        path: ../dataset/olist_orders_dataset.csv
+        keys: [order_id]
+      - entity: olist_order_items_dataset
+        path: ../dataset/olist_order_items_dataset.csv
+        keys: [order_id, order_item_id]
+      - entity: olist_order_payments_dataset
+        path: ../dataset/olist_order_payments_dataset.csv
+        keys: [order_id, payment_sequential]
+      - entity: olist_order_reviews_dataset
+        path: ../dataset/olist_order_reviews_dataset.csv
+        keys: [review_id]
+      - entity: olist_products_dataset
+        path: ../dataset/olist_products_dataset.csv
+        keys: [product_id]
+      - entity: olist_sellers_dataset
+        path: ../dataset/olist_sellers_dataset.csv
+        keys: [seller_id]
+      - entity: olist_geolocation_dataset
+        path: ../dataset/olist_geolocation_dataset.csv
+        keys: [geolocation_zip_code_prefix]
+      - entity: olist_marketing_qualified_leads_dataset
+        path: ../dataset/olist_marketing_qualified_leads_dataset.csv
+        keys: [mql_id]
+      - entity: olist_closed_deals_dataset
+        path: ../dataset/olist_closed_deals_dataset.csv
+        keys: [mql_id]
+      - entity: product_category_name_translation
+        path: ../dataset/product_category_name_translation.csv
+        keys: [product_category_name]
+  loaders:
+  - name: target-bigquery
+    variant: adswerve
+    pip_url: git+https://github.com/adswerve/target-bigquery.git@0.12.0
+    config:
+      # Resolved from repo-root .env (symlinked into meltano/.env).
+      project_id: ${GCP_PROJECT_ID}
+      credentials_path: ${GOOGLE_APPLICATION_CREDENTIALS}
+      dataset_id: raw_olist
+      location: US
+      # Mirror runpipeline.py's WRITE_TRUNCATE semantics on each run.
+      replication_method: truncate

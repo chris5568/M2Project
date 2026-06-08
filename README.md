@@ -1,0 +1,1 @@
+Create an end to end pipeline to load the CSV files in the dataset folder to Google BigQuery using meltano, dbt, Great Expectations and Dagster.
