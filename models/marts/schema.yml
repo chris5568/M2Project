@@ -1,0 +1,40 @@
+# ==============================================================================
+# PHASE 4: AUTOMATED SCHEMA QUALITY TESTING FRAMEWORK
+# ==============================================================================
+
+
+version: 2
+
+models:
+  - name: fact_sales
+    description: "Granular sales transactions that have been successfully delivered."
+    columns:
+      - name: sales_key
+        description: "Primary key: MD5 hash of order_id and item_sequence"
+        tests:
+          - unique
+          - not_null
+      - name: order_id
+        tests:
+          - not_null
+      - name: total_sale_amount
+        description: "Engineered revenue column combining item price and freight values."
+        tests:
+          - not_null
+
+  - name: dim_customers
+    description: "Customer master records containing engineered customer metrics."
+    columns:
+      - name: customer_key
+        description: "Primary key uniquely identifying individual checkout keys."
+        tests:
+          - unique
+          - not_null
+
+  - name: dim_products
+    description: "Product inventory metadata featuring clean English category definitions."
+    columns:
+      - name: product_key
+        tests:
+          - unique
+          - not_null
